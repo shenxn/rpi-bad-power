@@ -1,2 +1,7 @@
 # rpi-bad-power
-Python library to detect bad power supply on Raspberry Pi
+A Python library to detect bad power supply on Raspberry Pi
+
+## TODOs
+ - [ ] Docs
+ - [ ] Tests
+ - [ ] Automations (Github Actions)
