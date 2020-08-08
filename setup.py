@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="rpi-bad-power",
-    version="0.0.1",
+    version="0.0.2",
     author="Xiaonan Shen",
     author_email="s@sxn.dev",
     description="A Python library to detect bad power supply on Raspberry Pi ",
