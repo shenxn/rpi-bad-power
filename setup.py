@@ -1,6 +1,7 @@
+"""Setup script for PyPI package."""
 import setuptools
 
-with open("README.md", "r") as fh:
+with open("README.md") as fh:
     long_description = fh.read()
 
 setuptools.setup(
@@ -18,5 +19,5 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: POSIX :: Linux",
     ],
-    python_requires='>=3.6',
+    python_requires=">=3.6",
 )

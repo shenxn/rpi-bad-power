@@ -1,5 +1,6 @@
 """
-A sensor platform which detects underruns and capped status from the official Raspberry Pi Kernel.
+A library reading under voltage bit from the official Raspberry Pi Kernel.
+
 Minimal Kernel needed is 4.14+
 """
 import logging
@@ -15,11 +16,9 @@ SYSFILE_LEGACY = "/sys/devices/platform/soc/soc:firmware/get_throttled"
 
 UNDERVOLTAGE_STICKY_BIT = 1 << 16
 
-DESCRIPTION_NORMALIZED = "Voltage normalized. Everything is working as intended."
-DESCRIPTION_UNDER_VOLTAGE = "Under-voltage was detected. Consider getting a uninterruptible power supply for your Raspberry Pi."
 
 def get_rpi_volt_hwmon():
-    """Find rpi_volt hwmon device"""
+    """Find rpi_volt hwmon device."""
     try:
         hwmons = os.listdir(SYSFILE_HWMON_DIR)
     except FileNotFoundError:
@@ -35,6 +34,7 @@ def get_rpi_volt_hwmon():
 
     return None
 
+
 def new_under_voltage():
     """Create new UnderVoltage object."""
     hwmon = get_rpi_volt_hwmon()
@@ -48,10 +48,12 @@ def new_under_voltage():
 class UnderVoltage:
     """Read under voltage status."""
 
+
 class UnderVoltageNew(UnderVoltage):
     """Read under voltage status from new entry."""
 
     def __init__(self, hwmon):
+        """Initialize the under voltage class."""
         self._hwmon = hwmon
 
     def get(self):
@@ -73,6 +75,5 @@ class UnderVoltageLegacy(UnderVoltage):
             throttled = file.read()[:-1]
         _LOGGER.debug("Get throttled value: %s", throttled)
         return (
-            int(throttled, base=16) & UNDERVOLTAGE_STICKY_BIT
-            == UNDERVOLTAGE_STICKY_BIT
+            int(throttled, base=16) & UNDERVOLTAGE_STICKY_BIT == UNDERVOLTAGE_STICKY_BIT
         )
