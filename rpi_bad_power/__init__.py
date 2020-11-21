@@ -20,19 +20,26 @@ DESCRIPTION_UNDER_VOLTAGE = "Under-voltage was detected. Consider getting a unin
 
 def get_rpi_volt_hwmon():
     """Find rpi_volt hwmon device"""
-    for hwmon in os.listdir(SYSFILE_HWMON_DIR):
+    try:
+        hwmons = os.listdir(SYSFILE_HWMON_DIR)
+    except FileNotFoundError:
+        return None
+
+    for hwmon in hwmons:
         name_file = os.path.join(SYSFILE_HWMON_DIR, hwmon, "name")
         if os.path.isfile(name_file):
-            hwmon_name = open(name_file).read().strip()
+            with open(name_file) as file:
+                hwmon_name = file.read().strip()
             if hwmon_name == HWMON_NAME:
                 return os.path.join(SYSFILE_HWMON_DIR, hwmon)
+
     return None
 
 def new_under_voltage():
     """Create new UnderVoltage object."""
     hwmon = get_rpi_volt_hwmon()
     if hwmon:
-        return UnderVoltage(hwmon)
+        return UnderVoltageNew(hwmon)
     if os.path.isfile(SYSFILE_LEGACY):  # support older kernel
         return UnderVoltageLegacy()
     return None
@@ -41,13 +48,17 @@ def new_under_voltage():
 class UnderVoltage:
     """Read under voltage status."""
 
+class UnderVoltageNew(UnderVoltage):
+    """Read under voltage status from new entry."""
+
     def __init__(self, hwmon):
         self._hwmon = hwmon
 
     def get(self):
         """Get under voltage status."""
         # Use new hwmon entry
-        bit = open(os.path.join(self._hwmon, SYSFILE_HWMON_FILE)).read()[:-1]
+        with open(os.path.join(self._hwmon, SYSFILE_HWMON_FILE)) as file:
+            bit = file.read()[:-1]
         _LOGGER.debug("Get under voltage status: %s", bit)
         return bit == "1"
 
@@ -58,7 +69,8 @@ class UnderVoltageLegacy(UnderVoltage):
     def get(self):
         """Get under voltage status."""
         # Using legacy get_throttled entry
-        throttled = open(SYSFILE_LEGACY).read()[:-1]
+        with open(SYSFILE_LEGACY) as file:
+            throttled = file.read()[:-1]
         _LOGGER.debug("Get throttled value: %s", throttled)
         return (
             int(throttled, base=16) & UNDERVOLTAGE_STICKY_BIT
