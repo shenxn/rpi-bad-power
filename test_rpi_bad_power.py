@@ -22,10 +22,11 @@ class MockFile:
 
 class MockSysFiles:
     """Mocking the system files."""
-    def __init__(self, multi, new, legacy, isUnderVoltage):
+    def __init__(self, multi, new, legacy, noHwmon, isUnderVoltage):
         self.multi = multi  # multiple entries
         self.new = new  # single new entry
         self.legacy = legacy  # legacy entry
+        self.noHwmon = noHwmon  # hwmon dir does not exist
         self.isUnderVoltage = isUnderVoltage
 
         self.listdir = MagicMock(side_effect=self._listdir)
@@ -46,12 +47,14 @@ class MockSysFiles:
 
     def _listdir(self, path):
         assert path == SYSFILE_HWMON_DIR
+        if self.noHwmon:
+            raise FileNotFoundError()
         if self.multi:
             return ["hwmon0", "hwmon1", "hwmon2"]
         elif self.new:
             return ["hwmon0"]
         else:
-            raise FileNotFoundError()
+            return []
 
     def _open(self, path):
         try:
@@ -71,8 +74,8 @@ class MockSysFiles:
 
 class PatchSysFiles:
     """Patch the system files."""
-    def __init__(self, multi=False, new=False, legacy=False, isUnderVoltage=False):
-        self.mock = MockSysFiles(multi, new, legacy, isUnderVoltage)
+    def __init__(self, multi=False, new=False, legacy=False, noHwmn=False, isUnderVoltage=False):
+        self.mock = MockSysFiles(multi, new, legacy, noHwmn, isUnderVoltage)
         self.listdir_patch = None
         self.open_patch = None
         self.isfile_patch = None
@@ -101,6 +104,12 @@ def test_non_rpi():
     with PatchSysFiles() as mockSysFiles:
         assert new_under_voltage() is None
     mockSysFiles.listdir.assert_called_once_with(SYSFILE_HWMON_DIR)
+
+
+def test_non_rpi():
+    """Test running on a system without hwmon directory."""
+    with PatchSysFiles(noHwmn=True):
+        assert new_under_voltage() is None
 
 
 def test_multi():
