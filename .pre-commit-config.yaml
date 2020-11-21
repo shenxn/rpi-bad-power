@@ -62,3 +62,8 @@ repos:
     rev: v0.790
     hooks:
       - id: mypy
+  - repo: https://github.com/pre-commit/mirrors-pylint
+    rev: v2.6.0
+    hooks:
+      - id: pylint
+        additional_dependencies: [pylint-strict-informational]
