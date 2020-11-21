@@ -1,10 +1,6 @@
 # rpi-bad-power
 A Python library to detect bad power supply on Raspberry Pi. This library is mainly built for the [Raspberry Pi Power Supply Checker](https://www.home-assistant.io/integrations/rpi_power/) integration of [HomeAssistant](https://github.com/home-assistant/core). It should also work for other purpose.
 
-## Warning
-
-This project is at an early stage so there can be bugs and breaking changes.
-
 ## Compatibility
 
 This library only works on kernel 4.14+. It supports getting the under voltage bit from different entries.
