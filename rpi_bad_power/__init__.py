@@ -41,7 +41,6 @@ class UnderVoltage:
 
     def get(self) -> bool:
         """Get under voltage status."""
-        raise NotImplementedError()
 
 
 class UnderVoltageNew(UnderVoltage):
