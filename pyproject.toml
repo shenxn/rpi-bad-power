@@ -1,115 +1,126 @@
 [build-system]
-requires = [
-  "setuptools >= 40.9.0",
-  "wheel",
-]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
 
-[tool.black]
-target-version = ["py37", "py38"]
-exclude = 'generated'
-
-[tool.isort]
-# https://github.com/PyCQA/isort/wiki/isort-Settings
-profile = "black"
-# will group `import x` and `from x import` of the same module.
-force_sort_within_sections = true
-known_first_party = [
-    "homeassistant",
-    "tests",
+[project]
+name = "rpi-bad-power"
+version = "0.2.0"
+description = "A Python library to detect bad power supply and throttling on Raspberry Pi."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+authors = [
+    { name = "Xiaonan Shen", email = "s@sxn.dev" },
 ]
-forced_separate = [
-    "tests",
+keywords = [
+    "raspberry-pi",
+    "rpi",
+    "home-assistant",
+    "power",
+    "undervoltage",
+    "hwmon",
 ]
-combine_as_imports = true
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+    "Topic :: Home Automation",
+    "Topic :: Software Development :: Embedded Systems",
+    "Topic :: System :: Hardware",
+    "Typing :: Typed",
+]
+dependencies = []
 
-[tool.pylint.MASTER]
+[project.urls]
+Homepage = "https://github.com/shenxn/rpi-bad-power"
+Repository = "https://github.com/shenxn/rpi-bad-power"
+"Bug Tracker" = "https://github.com/shenxn/rpi-bad-power/issues"
+Changelog = "https://github.com/shenxn/rpi-bad-power/blob/master/CHANGELOG.md"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.25.0",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.9.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["rpi_bad_power"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "A",
+    "ARG",
+    "ASYNC",
+    "B",
+    "BLE",
+    "C4",
+    "D",
+    "E",
+    "F",
+    "FA",
+    "I",
+    "N",
+    "PIE",
+    "PT",
+    "PTH",
+    "RUF",
+    "SIM",
+    "TC",
+    "UP",
+    "W",
+    "YTT",
+]
 ignore = [
-    "tests",
-]
-# Use a conservative default here; 2 should speed up most setups and not hurt
-# any too bad. Override on command line as appropriate.
-# Disabled for now: https://github.com/PyCQA/pylint/issues/3584
-#jobs = 2
-load-plugins = [
-    "pylint_strict_informational",
-]
-persistent = false
-extension-pkg-whitelist = [
-    "ciso8601",
-    "cv2",
+    "D203",
+    "D213",
 ]
 
-[tool.pylint.BASIC]
-good-names = [
-    "_",
-    "ev",
-    "ex",
-    "fp",
-    "i",
-    "id",
-    "j",
-    "k",
-    "Run",
-    "T",
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D100", "D101", "D102", "D103", "D104", "D107"]
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+combine-as-imports = true
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+show_error_codes = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unused_ignores = true
+warn_unreachable = true
+
+[tool.coverage.run]
+branch = true
+source = ["rpi_bad_power"]
+
+[tool.coverage.report]
+fail_under = 95
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
 ]
 
-[tool.pylint."MESSAGES CONTROL"]
-# Reasons disabled:
-# format - handled by black
-# locally-disabled - it spams too much
-# duplicate-code - unavoidable
-# cyclic-import - doesn't test if both import on load
-# abstract-class-little-used - prevents from setting right foundation
-# unused-argument - generic callbacks and setup methods create a lot of warnings
-# too-many-* - are not enforced for the sake of readability
-# too-few-* - same as too-many-*
-# abstract-method - with intro of async there are always methods missing
-# inconsistent-return-statements - doesn't handle raise
-# too-many-ancestors - it's too strict.
-# wrong-import-order - isort guards this
-disable = [
-    "format",
-    "abstract-class-little-used",
-    "abstract-method",
-    "cyclic-import",
-    "duplicate-code",
-    "inconsistent-return-statements",
-    "locally-disabled",
-    "not-context-manager",
-    "too-few-public-methods",
-    "too-many-ancestors",
-    "too-many-arguments",
-    "too-many-branches",
-    "too-many-instance-attributes",
-    "too-many-lines",
-    "too-many-locals",
-    "too-many-public-methods",
-    "too-many-return-statements",
-    "too-many-statements",
-    "too-many-boolean-expressions",
-    "unused-argument",
-    "wrong-import-order",
-]
-enable = [
-    #"useless-suppression",  # temporarily every now and then to clean them up
-    "use-symbolic-message-instead",
-]
-
-[tool.pylint.REPORTS]
-score = false
-
-[tool.pylint.TYPECHECK]
-ignored-classes = [
-    "_CountingAttr",  # for attrs
-]
-
-[tool.pylint.FORMAT]
-expected-line-ending-format = "LF"
-
-[tool.pylint.EXCEPTIONS]
-overgeneral-exceptions = [
-    "BaseException",
-    "Exception",
-    "HomeAssistantError",
-]
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = ["error"]
+addopts = "-vv --cov --cov-report=term-missing"

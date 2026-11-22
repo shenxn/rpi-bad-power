@@ -57,3 +57,4 @@ rules:
     level: error
   truthy:
     level: error
+    check-keys: false
